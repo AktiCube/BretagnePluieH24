@@ -36,11 +36,11 @@ async def main() -> None:
             logger.info('   Getting weather data for %s.' % city)
             weather = await weather_client.get(f"{city}, Bretagne, France")
 
-            if weather.current.precipitation > 8:
+            if weather.current.precipitation >= 4:
                 cities_precipitation[city] = WeatherType.RAIN_HEAVY
-            elif weather.current.precipitation > 4:
+            elif weather.current.precipitation >= 2:
                 cities_precipitation[city] = WeatherType.RAIN_MEDIUM
-            elif weather.current.precipitation > 0.3:
+            elif weather.current.precipitation > 0:
                 cities_precipitation[city] = WeatherType.RAIN_LIGHT
             else:
                 continue
