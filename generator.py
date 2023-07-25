@@ -46,7 +46,7 @@ def generate_image(city: str, text_weather: str, text_state: str, font_size_weat
     text_city = f"📍 {city}"
     font_weather = ImageFont.truetype("fonts/Montserrat-ExtraBold.ttf", font_size_weather)
 
-    account_logo = Image.open("images/account_logo.jpg")
+    account_logo = Image.open("images/account_logo_black.jpg")
     account_logo = account_logo.resize((150, 150))
     account_logo_width, account_logo_height = account_logo.size
     account_logo_x = width - account_logo_width - 20
