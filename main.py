@@ -1,49 +1,59 @@
 import python_weather
 import instagrapi
-import logging
 import asyncio
 import os
+from random import sample, choice
 from dotenv import load_dotenv
 from enum import Enum
-from utils import _ColourFormatter
 from instagrapi.exceptions import LoginRequired
+from utils import get_logger
 
 load_dotenv()
 
-handler = logging.StreamHandler()
-file_handler = logging.FileHandler('BretagnePluieH24.log')
-logger = logging.getLogger('BretagnePluieH24')
-logger.setLevel(logging.INFO)
-handler.setFormatter(_ColourFormatter())
-file_handler.setFormatter(logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', '%Y-%m-%d %H:%M:%S', style='{'))
-logger.addHandler(handler)
-logger.addHandler(file_handler)
+logger = get_logger()
 
 INSTAGRAM_USERNAME = os.environ.get('INSTAGRAM_USERNAME')
 INSTAGRAM_PASSWORD = os.environ.get('INSTAGRAM_PASSWORD')
 
 class WeatherType(Enum):
-    RAIN_LIGHT = ['images/rain_light.jpg', 'texts/rain_light.txt']
-    RAIN_MEDIUM = ['images/rain_medium.jpg', 'texts/rain_medium.txt']
-    RAIN_HEAVY = ['images/rain_heavy.jpg', 'texts/rain_heavy.txt']
+    RAIN_LIGHT = 1
+    RAIN_MEDIUM = 2
+    RAIN_HEAVY = 3
 
 async def main() -> None:
+    logger.info('Getting Brittany cities.')
+    with open('cities.txt', 'r', encoding='utf-8') as f:
+        cities = f.read().split('\n')
+
+    logger.info('Selecting 10 random cities.')
+    random_cities = sample(cities, 10)
+
+    logger.info('Getting precipitation for each city :')
+    cities_precipitation = {}
+
     async with python_weather.Client(unit=python_weather.METRIC) as weather_client:
-        logger.info('Getting weather data.')
+        for city in random_cities:
+            logger.info('   Getting weather data for %s.' % city)
+            weather = await weather_client.get(f"{city}, Bretagne, France")
 
-        weather = await weather_client.get('Saint-Ségal, France')
+            if weather.current.precipitation > 8:
+                cities_precipitation[city] = WeatherType.RAIN_HEAVY
+            elif weather.current.precipitation > 4:
+                cities_precipitation[city] = WeatherType.RAIN_MEDIUM
+            elif weather.current.precipitation > 0.3:
+                cities_precipitation[city] = WeatherType.RAIN_LIGHT
+            else:
+                continue
 
-        if weather.current.precipitation > 8:
-            rain_type = WeatherType.RAIN_HEAVY
-        elif weather.current.precipitation > 4:
-            rain_type = WeatherType.RAIN_MEDIUM
-        elif weather.current.precipitation > 0.3:
-            rain_type = WeatherType.RAIN_LIGHT
-        else:
-            logger.info('There is no rain, nothing to do.')
-            return
+    if len(cities_precipitation) == 0:
+        logger.info('No rain detected on any of the cities, exiting.')
+        return
 
-    logger.info(f'{rain_type.name} detected, posting to Instagram the corresponding picture and caption.')
+    logger.info('Rain detected on %d cities, selecting one randomly.' % len(cities_precipitation))
+    city = choice(list(cities_precipitation.keys()))
+    rain_type = cities_precipitation[city]
+
+    logger.info(f'{rain_type.name} detected on {city}, posting to Instagram the corresponding picture and caption.')
 
     logger.info('Logging in to Instagram.')
     instagram_client = login_instagram()
@@ -51,7 +61,7 @@ async def main() -> None:
     logger.info('Getting the latest media posted on Instagram.')
     latest_media = instagram_client.user_medias(instagram_client.user_id, 1)
 
-    with open(rain_type.value[1], 'r', encoding='utf-8') as _caption_file:
+    with open(f'texts/{rain_type.name.lower()}.txt', 'r', encoding='utf-8') as _caption_file:
         caption = _caption_file.read()
 
     if len(latest_media) > 0 and latest_media[0].caption_text.lower() == caption.lower():
@@ -59,7 +69,7 @@ async def main() -> None:
         return
 
     logger.info('There is no media posted about this rain type, posting it.')
-    instagram_client.photo_upload(rain_type.value[0], caption)
+    instagram_client.photo_upload(f"images/generated/{rain_type.name.lower()}_{city.replace(' ', '_')}", caption)
     logger.info('Media posted.')
 
     instagram_client.dump_settings("instagram_session.json")
