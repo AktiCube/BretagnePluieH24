@@ -69,7 +69,7 @@ async def main() -> None:
         return
 
     logger.info('There is no media posted about this rain type, posting it.')
-    instagram_client.photo_upload(f"images/generated/{rain_type.name.lower()}_{city.replace(' ', '_')}", caption)
+    instagram_client.photo_upload(f"images/generated/{rain_type.name.lower()}_{city.replace(' ', '_')}.jpg", caption)
     logger.info('Media posted.')
 
     instagram_client.dump_settings("instagram_session.json")
