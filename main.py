@@ -41,8 +41,7 @@ async def main() -> None:
             rain_type = WeatherType.RAIN_LIGHT
         else:
             logger.info('There is no rain, nothing to do.')
-            rain_type = WeatherType.RAIN_HEAVY
-            # return
+            return
 
     logger.info(f'{rain_type.name} detected, posting to Instagram the corresponding picture and caption.')
 
