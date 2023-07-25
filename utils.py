@@ -43,3 +43,14 @@ class _ColourFormatter(logging.Formatter):
         # Remove the cache layer
         record.exc_text = None
         return output
+
+def get_logger() -> logging.Logger:
+    handler = logging.StreamHandler()
+    file_handler = logging.FileHandler('BretagnePluieH24.log')
+    logger = logging.getLogger('BretagnePluieH24')
+    logger.setLevel(logging.INFO)
+    handler.setFormatter(_ColourFormatter())
+    file_handler.setFormatter(logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', '%Y-%m-%d %H:%M:%S', style='{'))
+    logger.addHandler(handler)
+    logger.addHandler(file_handler)
+    return logger
