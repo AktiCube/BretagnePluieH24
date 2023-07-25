@@ -2,6 +2,7 @@ import python_weather
 import instagrapi
 import asyncio
 import os
+import logging
 from random import sample, choice
 from dotenv import load_dotenv
 from enum import Enum
@@ -47,6 +48,7 @@ async def main() -> None:
 
     if len(cities_precipitation) == 0:
         logger.info('No rain detected on any of the cities, exiting.')
+        logging.shutdown()
         return
 
     logger.info('Rain detected on %d cities, selecting one randomly.' % len(cities_precipitation))
@@ -74,6 +76,7 @@ async def main() -> None:
 
     instagram_client.dump_settings("instagram_session.json")
     logger.info('Session saved, exiting.')
+    logging.shutdown()
 
 def login_instagram() -> instagrapi.Client:
     instagram_client = instagrapi.Client()
