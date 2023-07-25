@@ -2,4 +2,4 @@ instagrapi>=1.18.2
 python-weather>=1.0.3
 python-dotenv>=1.0.0
 Pillow==9.5.0
-pilmoji>=2.0.3
+pilmoji @ git+https://github.com/AktiCube/pilmoji.git@095beae6d5fc646d5156c73f950806505439e002
