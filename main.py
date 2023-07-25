@@ -64,9 +64,9 @@ async def main() -> None:
     with open(f'texts/{rain_type.name.lower()}.txt', 'r', encoding='utf-8') as _caption_file:
         caption = _caption_file.read()
 
-    if len(latest_media) > 0 and latest_media[0].caption_text.lower() == caption.lower():
-        logger.warning('The latest media is already posted, nothing to do.')
-        return
+    # if len(latest_media) > 0 and latest_media[0].caption_text.lower() == caption.lower():
+    #     logger.warning('The latest media is already posted, nothing to do.')
+    #     return
 
     logger.info('There is no media posted about this rain type, posting it.')
     instagram_client.photo_upload(f"images/generated/{rain_type.name.lower()}_{city.replace(' ', '_')}.jpg", caption)
