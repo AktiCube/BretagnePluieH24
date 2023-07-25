@@ -4,7 +4,7 @@ from pilmoji import Pilmoji
 from pilmoji.source import AppleEmojiSource
 from utils import get_logger
 
-logger = get_logger()
+logger = get_logger('BretagnePluieH24-ImageGenerator')
 
 TEXT_COLOR = (0, 0, 0)
 BACKGROUND_COLOR = (255, 255, 255)

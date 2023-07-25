@@ -44,10 +44,10 @@ class _ColourFormatter(logging.Formatter):
         record.exc_text = None
         return output
 
-def get_logger() -> logging.Logger:
+def get_logger(logger_name: str = "BretagnePluieH24") -> logging.Logger:
     handler = logging.StreamHandler()
-    file_handler = logging.FileHandler('BretagnePluieH24.log')
-    logger = logging.getLogger('BretagnePluieH24')
+    file_handler = logging.FileHandler(f'{logger_name}.log')
+    logger = logging.getLogger(logger_name)
     logger.setLevel(logging.INFO)
     handler.setFormatter(_ColourFormatter())
     file_handler.setFormatter(logging.Formatter('[{asctime}] [{levelname:<8}] {name}: {message}', '%Y-%m-%d %H:%M:%S', style='{'))
