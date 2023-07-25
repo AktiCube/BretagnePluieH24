@@ -37,7 +37,7 @@ async def main() -> None:
             rain_type = WeatherType.RAIN_HEAVY
         elif weather.current.precipitation > 4:
             rain_type = WeatherType.RAIN_MEDIUM
-        elif weather.current.precipitation > 1:
+        elif weather.current.precipitation > 0.3:
             rain_type = WeatherType.RAIN_LIGHT
         else:
             logger.info('There is no rain, nothing to do.')
