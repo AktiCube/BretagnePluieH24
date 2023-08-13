@@ -13,8 +13,8 @@ load_dotenv()
 
 logger = get_logger()
 
-INSTAGRAM_USERNAME = os.environ.get('INSTAGRAM_USERNAME')
-INSTAGRAM_PASSWORD = os.environ.get('INSTAGRAM_PASSWORD')
+INSTAGRAM_USERNAME = os.environ.get("INSTAGRAM_USERNAME")
+INSTAGRAM_PASSWORD = os.environ.get("INSTAGRAM_PASSWORD")
 
 class WeatherType(Enum):
     RAIN_LIGHT = 1
@@ -22,19 +22,19 @@ class WeatherType(Enum):
     RAIN_HEAVY = 3
 
 async def main() -> None:
-    logger.info('Getting Brittany cities.')
-    with open('cities.txt', 'r', encoding='utf-8') as f:
-        cities = f.read().split('\n')
+    logger.info("Getting Brittany cities.")
+    with open("cities.txt", "r", encoding="utf-8") as f:
+        cities = f.read().split("\n")
 
-    logger.info('Selecting 10 random cities.')
-    random_cities = sample(cities, 10)
+    logger.info("Shuffling cities.")
+    random_cities = sample(cities, len(cities))
 
-    logger.info('Getting precipitation for each city :')
+    logger.info("Getting precipitation for each city :")
     cities_precipitation = {}
 
     async with python_weather.Client(unit=python_weather.METRIC) as weather_client:
         for city in random_cities:
-            logger.info('   Getting weather data for %s.' % city)
+            logger.info("   Getting weather data for %s." % city)
             weather = await weather_client.get(f"{city}, Bretagne, France")
 
             if weather.current.precipitation >= 4:
@@ -47,35 +47,35 @@ async def main() -> None:
                 continue
 
     if len(cities_precipitation) == 0:
-        logger.info('No rain detected on any of the cities, exiting.')
+        logger.info("No rain detected on any of the cities, exiting.")
         logging.shutdown()
         return
 
-    logger.info('Rain detected on %d cities, selecting one randomly.' % len(cities_precipitation))
+    logger.info("Rain detected on %d cities, selecting one randomly." % len(cities_precipitation))
     city = choice(list(cities_precipitation.keys()))
     rain_type = cities_precipitation[city]
 
-    logger.info(f'{rain_type.name} detected on {city}, posting to Instagram the corresponding picture and caption.')
+    logger.info(f"{rain_type.name} detected on {city}, posting to Instagram the corresponding picture and caption.")
 
-    logger.info('Logging in to Instagram.')
+    logger.info("Logging in to Instagram.")
     instagram_client = login_instagram()
 
-    logger.info('Getting the latest media posted on Instagram.')
-    latest_media = instagram_client.user_medias(instagram_client.user_id, 1)
+    #logger.info("Getting the latest media posted on Instagram.")
+    #latest_media = instagram_client.user_medias(instagram_client.user_id, 1)
 
-    with open(f'texts/{rain_type.name.lower()}.txt', 'r', encoding='utf-8') as _caption_file:
+    with open(f"texts/{rain_type.name.lower()}.txt", "r", encoding="utf-8") as _caption_file:
         caption = _caption_file.read()
 
     # if len(latest_media) > 0 and latest_media[0].caption_text.lower() == caption.lower():
-    #     logger.warning('The latest media is already posted, nothing to do.')
+    #     logger.warning("The latest media is already posted, nothing to do.")
     #     return
 
-    logger.info('There is no media posted about this rain type, posting it.')
+    #logger.info("There is no media posted about this rain type, posting it.")
     instagram_client.photo_upload(f"images/generated/{rain_type.name.lower()}_{city.replace(' ', '_')}.jpg", caption)
-    logger.info('Media posted.')
+    logger.info("Media posted.")
 
     instagram_client.dump_settings("instagram_session.json")
-    logger.info('Session saved, exiting.')
+    logger.info("Session saved, exiting.")
     logging.shutdown()
 
 def login_instagram() -> instagrapi.Client:
@@ -119,8 +119,8 @@ def login_instagram() -> instagrapi.Client:
         instagram_client.dump_settings("instagram_session.json")
         return instagram_client
 
-if __name__ == '__main__':
-    if os.name == 'nt':
+if __name__ == "__main__":
+    if os.name == "nt":
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
     
     asyncio.run(main())
