@@ -35,7 +35,7 @@ async def main() -> None:
     async with python_weather.Client(unit=python_weather.METRIC) as weather_client:
         for city in random_cities:
             logger.info("   Getting weather data for %s." % city)
-            weather = await weather_client.get(f"{city}, Bretagne, France")
+            weather = await weather_client.get(f"{city}, Bretagne, France", locale=python_weather.Locale.FRENCH)
 
             if weather.current.precipitation >= 4:
                 cities_precipitation[city] = WeatherType.RAIN_HEAVY
