@@ -26,8 +26,8 @@ async def main() -> None:
     with open("cities.txt", "r", encoding="utf-8") as f:
         cities = f.read().split("\n")
 
-    logger.info("Shuffling cities.")
-    random_cities = sample(cities, len(cities))
+    logger.info("Getting 50 random cities from Brittany.")
+    random_cities = sample(cities, 50)
 
     logger.info("Getting precipitation for each city :")
     cities_precipitation = {}
@@ -60,17 +60,9 @@ async def main() -> None:
     logger.info("Logging in to Instagram.")
     instagram_client = login_instagram()
 
-    #logger.info("Getting the latest media posted on Instagram.")
-    #latest_media = instagram_client.user_medias(instagram_client.user_id, 1)
-
     with open(f"texts/{rain_type.name.lower()}.txt", "r", encoding="utf-8") as _caption_file:
         caption = _caption_file.read()
 
-    # if len(latest_media) > 0 and latest_media[0].caption_text.lower() == caption.lower():
-    #     logger.warning("The latest media is already posted, nothing to do.")
-    #     return
-
-    #logger.info("There is no media posted about this rain type, posting it.")
     instagram_client.photo_upload(f"images/generated/{rain_type.name.lower()}_{city.replace(' ', '_')}.jpg", caption)
     logger.info("Media posted.")
 
